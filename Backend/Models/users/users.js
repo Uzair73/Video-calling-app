@@ -23,4 +23,12 @@ const fetch_all_users = async () => {
   return res.rows;
   }
 
-module.exports = { create_user, find_user_by_email, fetch_all_users };
+
+// fetch user by the id
+const fetch_user_by_id = async (id) => {
+  const res = await db.query('SELECT id, username, email, create_at FROM users WHERE id = $1', [id])
+  return res.rows[0];
+}
+
+
+module.exports = { create_user, find_user_by_email, fetch_all_users, fetch_user_by_id };
