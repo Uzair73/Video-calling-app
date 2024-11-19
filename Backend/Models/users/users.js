@@ -16,4 +16,11 @@ const find_user_by_email = async (email) => {
   const res = await db.query('SELECT * FROM users WHERE email = $1', [email])
   return res.rows[0];
 }
-module.exports = { create_user, find_user_by_email };
+
+// fetch all users
+const fetch_all_users = async () => {
+  const res = await db.query('SELECT id, username, email, create_at FROM users');
+  return res.rows;
+  }
+
+module.exports = { create_user, find_user_by_email, fetch_all_users };
