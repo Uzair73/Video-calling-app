@@ -30,5 +30,10 @@ const fetch_user_by_id = async (id) => {
   return res.rows[0];
 }
 
+// update the user data
+const update_user = async({id, username}) =>{
+  const res = await db.query('UPDATE users SET username = $1 WHERE id = $2 RETURNING id,username,email,create_at,updated_at', [username, id])
+  return res.rows[0]
+}
 
-module.exports = { create_user, find_user_by_email, fetch_all_users, fetch_user_by_id };
+module.exports = { create_user, find_user_by_email, fetch_all_users, fetch_user_by_id , update_user};
