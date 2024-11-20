@@ -15,7 +15,7 @@ const user_by_id = async (req,res)=>{
         return res.status(200).json({success : true, user: user})
  } catch (error) {
     console.log("Error fetching user by id", error);
-    res.status(500).json({success: false, message: "Internal Server Error", Error: error});
+    res.status(500).json({success: false, message: "Internal Server Error", error: error.message});
  }
 }
 

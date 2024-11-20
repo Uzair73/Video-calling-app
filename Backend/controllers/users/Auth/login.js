@@ -6,21 +6,25 @@ require("dotenv").config();
 
 // login endpoint
 const login = async (req, res) => {
-  const { email, user_password } = req.body;
-  const user = await find_user_by_email(email);
-  if (!user) {
-    return res.status(401).json({ message: "Invalid email or password", success: false});
+  try {
+    const { email, user_password } = req.body;
+    const user = await find_user_by_email(email);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Not Found: User does't exists"});
+    }
+    const isValidPassword = await bcrypt.compare(user_password, user.user_password);
+    if (!isValidPassword) {
+      return res.status(400).json({ success: false, message: "Invalid email or password"});
+    }
+    const token = jwt.sign({ userId: user.id }, process.env.TOKEN_SECREAT, {
+      expiresIn: "1h",
+    });
+    console.log("token", token);
+    return res.status(200).json({success: true, message: "Successfully Login", token});
+  } catch (error) {
+    console.error("Error during user login", error);
+    res.status(500).json({ success: false, message: "Internal server error", error: error.message});
   }
-  const isValidPassword = await bcrypt.compare(user_password, user.user_password);
-  if (!isValidPassword) {
-    return res.status(400).json({ message: "Invalid email or password" , success: false});
-  }
-  const token = jwt.sign({ userId: user.id }, process.env.TOKEN_SECREAT, {
-    expiresIn: "1h",
-  });
-  console.log("token", token);
-  res.json({ token , success: true});
 };
-
 
 module.exports = login;
