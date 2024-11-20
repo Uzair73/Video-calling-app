@@ -16,4 +16,24 @@ const find_user_by_email = async (email) => {
   const res = await db.query('SELECT * FROM users WHERE email = $1', [email])
   return res.rows[0];
 }
-module.exports = { create_user, find_user_by_email };
+
+// fetch all users
+const fetch_all_users = async () => {
+  const res = await db.query('SELECT id, username, email, create_at FROM users');
+  return res.rows;
+  }
+
+
+// fetch user by the id
+const fetch_user_by_id = async (id) => {
+  const res = await db.query('SELECT id, username, email, create_at FROM users WHERE id = $1', [id])
+  return res.rows[0];
+}
+
+// update the user data
+const update_user = async({id, username}) =>{
+  const res = await db.query('UPDATE users SET username = $1 WHERE id = $2 RETURNING id,username,email,create_at,updated_at', [username, id])
+  return res.rows[0]
+}
+
+module.exports = { create_user, find_user_by_email, fetch_all_users, fetch_user_by_id , update_user};
