@@ -6,10 +6,15 @@ const create_room = async ({room_name, created_by, room_type})=>{
     return res.rows[0]
 }
 
-// fetch the room details
-const fetch_room = async (id)=>{
-    const res = await db.query('SELECT * FROM rooms WHERE id = $1', [id])
+// fetch the room details by the user id
+const fetch_room = async (created_by)=>{
+    const res = await db.query('SELECT * FROM rooms WHERE created_by = $1', [created_by])
     return res.rows[0]
 }
 
-module.exports = { create_room , fetch_room }
+// fetch the list of available room
+const room_list = async ()=>{
+    const res = await db.query('SELECT * FROM rooms')
+    return res.rows
+}
+module.exports = { create_room , fetch_room, room_list }
