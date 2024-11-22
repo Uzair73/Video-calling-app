@@ -9,6 +9,7 @@ const pool = require("./daos/db_connection/db_connect");
 // define route path
 const auth_routes = require('./routes/auth_routes')
 const user_route = require('./routes/user_routes')
+const participant_route = require('./routes/room_participant')
 
 // Serve the static HTML file
 // app.get("/", (req, res) => {
@@ -43,6 +44,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/auth', auth_routes);
 app.use('/users', user_route);
+app.use('/api', participant_route);
 
 // Start the server
 server.listen(3000, () => {
