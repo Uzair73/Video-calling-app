@@ -21,6 +21,13 @@ BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
+-- room participant Schema
+CREATE TABLE room_participants (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    room_id INTEGER NOT NULL REFERENCES rooms(id),
+    joined_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+)
 -- Room Schema is here
 CREATE TABLE rooms (
     id SERIAL PRIMARY KEY,
