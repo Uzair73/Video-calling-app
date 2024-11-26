@@ -21,13 +21,16 @@ const Login = () => {
     });
     setError("");
     setSuccess("");
-
+  }
   const togglePasswordVisibility = () => {
     setPasswordHide(!passwordHide);
   };
 
   const handle_submit = async (e) => {
     e.preventDefault();
+    if(input.email === "" || input.user_password === "") {
+      return setError("Please fill in all fields");
+    }
     try {
       const formdata = input
       const res = await login(formdata);
@@ -125,12 +128,13 @@ const Login = () => {
               }}
             />
             <div style={{ marginTop: "1rem", textAlign: "center", color: "#FFFFFF" }}>
-              Don't have an account? <Link to='/register' style={{ color: "#0078FF" }}> Register Yourself</Link>
+              Don't have an account? <Link to='/register' style={{ color: "#C4C4C4", textDecoration: "none" }}> Register Yourself</Link>
             </div>
           </Box>
         </Box>
       </Container>
     </>
-  )};
+  )
 }
+
 export default Login;
