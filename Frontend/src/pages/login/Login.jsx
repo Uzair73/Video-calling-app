@@ -1,24 +1,48 @@
 import React, { useState } from "react";
-import { Box, Container, Typography, TextField } from "@mui/material";
+import { Box, Container, Typography, TextField, IconButton, InputAdornment, Alert } from "@mui/material";
 import Button from "../../components/button/button"; // Assuming you have a custom Button component
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { login } from '../../api/api';
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Login = () => {
   const [input, setInput] = useState({
     email: "",
-    password: "",
+    user_password: "",
   });
+  const [passwordHide, setPasswordHide] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handle_change = (e) => {
     setInput({
       ...input,
       [e.target.name]: e.target.value,
     });
+    setError("");
+    setSuccess("");
+  }
+  const togglePasswordVisibility = () => {
+    setPasswordHide(!passwordHide);
   };
 
   const handle_submit = async (e) => {
     e.preventDefault();
-    console.log("submitted the data", input);
+    if(input.email === "" || input.user_password === "") {
+      return setError("Please fill in all fields");
+    }
+    try {
+      const formdata = input
+      const res = await login(formdata);
+      console.log("Login successful", res.message);
+      setSuccess(res.message);
+      setError("");
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        setError(error.response.data.message);
+      }
+      setSuccess("");
+    }
   };
 
   return (
@@ -26,18 +50,20 @@ const Login = () => {
       <Container
         maxWidth="sm"
         sx={{
-          backgroundColor: "#1E1E2F", // Dark background
-          color: "#FFFFFF", // Text color
+          backgroundColor: "#1E1E2F",
+          color: "#FFFFFF",
           padding: "2rem",
           borderRadius: "12px",
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.5)",
-          marginTop: "3rem", // Center the login form vertically
+          marginTop: "3rem",
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <Typography variant="h4" gutterBottom sx={{ color: "#FFFFFF", fontWeight: "bold" }}>
             Login
           </Typography>
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>}
           <Box component="form" onSubmit={handle_submit} noValidate sx={{ mt: 1, width: "100%" }}>
             <TextField
               margin="normal"
@@ -59,16 +85,28 @@ const Login = () => {
               margin="normal"
               required
               fullWidth
-              name="password"
+              name="user_password"
               label="Password"
-              type="password"
-              id="password"
+              type={passwordHide ? "password" : "text"}
+              id="user_password"
               autoComplete="current-password"
-              value={input.password}
+              value={input.user_password}
               onChange={handle_change}
               InputLabelProps={{ style: { color: "#FFFFFF" } }}
               InputProps={{
                 style: { color: "#FFFFFF", backgroundColor: "#292942", borderRadius: "5px" },
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                      sx={{ color: 'white' }}
+                    >
+                      {passwordHide ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             />
             <Button
@@ -89,14 +127,14 @@ const Login = () => {
                 borderRadius: "5px",
               }}
             />
-           <div style={{ marginTop: "1rem", textAlign: "center", color: "#FFFFFF" }}>
-              Don't have an account? <Link to='/register' style={{ color: "#0078FF" }}>Register Yourself</Link>
-           </div>
+            <div style={{ marginTop: "1rem", textAlign: "center", color: "#FFFFFF" }}>
+              Don't have an account? <Link to='/register' style={{ color: "#C4C4C4", textDecoration: "none" }}> Register Yourself</Link>
+            </div>
           </Box>
         </Box>
       </Container>
     </>
-  );
-};
+  )
+}
 
 export default Login;

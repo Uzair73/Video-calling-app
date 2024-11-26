@@ -1,53 +1,79 @@
-import { Box, Container, Typography, TextField, Alert } from "@mui/material";
+import { Box, Container, Typography, TextField, Alert, IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import React, { useState } from "react";
 import Button from "../../components/button/button";
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { register } from '../../api/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password: "",
-    confirm_password: "",
+    user_password: "",
+    confirm_user_password: "",
   });
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [passwordHide, setPasswordHide] = useState(false);
+  const [confrim_passwordHide, confirm_setPasswordHide] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-    setError(""); // Reset error message on input change
+    setError("");
+    setSuccess("");
   };
 
-  const handleSubmit = (e) => {
+  const togglePassword = () => {
+    setPasswordHide(!passwordHide);
+  };
+
+  const toggle_confrim_Password = () => {
+    confirm_setPasswordHide(!confrim_passwordHide);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirm_password) {
+    if(formData.username === "" || formData.email === "" || formData.user_password === "" || formData.confirm_user_password === ""){
+      return setError("Please fill in all fields");
+    }
+    if (formData.user_password !== formData.confirm_user_password) {
       setError("Passwords do not match.");
       return;
     }
-    console.log(formData);
-    // Proceed with form submission logic here
+    try {
+      const res = await register(formData);
+      console.log("Registration successful", res.data);
+      setSuccess(res.data.message);
+      setError("");
+    } catch (error) {
+      console.error("Registration error", error);
+      setError(error.response?.data?.message || "An unexpected error occurred.");
+      setSuccess("");
+    }
   };
 
   return (
     <Container
       maxWidth="sm"
       sx={{
-        backgroundColor: "#1E1E2F", // Dark background
-        color: "#FFFFFF", // Text color
+        backgroundColor: "#1E1E2F",
+        color: "#FFFFFF",
         padding: "2rem",
         borderRadius: "12px",
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.5)",
-        marginTop: "3rem", // Center the register form vertically
+        marginTop: "3rem",
       }}
     >
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <Typography variant="h4" gutterBottom sx={{ color: "#FFFFFF", fontWeight: "bold" }}>
           Register
         </Typography>
-        {error && <Alert severity="error" sx={{ width: "100%", marginBottom: "1rem" }}>{error}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: "100%" }}>
           <TextField
             margin="normal"
@@ -84,32 +110,56 @@ const Register = () => {
             margin="normal"
             required
             fullWidth
-            name="password"
+            name="user_password"
             label="Password"
-            type="password"
-            id="password"
+            type={passwordHide ? "text": "password"}
+            id="user_password"
             autoComplete="current-password"
-            value={formData.password}
+            value={formData.user_password}
             onChange={handleChange}
             InputLabelProps={{ style: { color: "#FFFFFF" } }}
             InputProps={{
               style: { color: "#FFFFFF", backgroundColor: "#292942", borderRadius: "5px" },
+               endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={togglePassword}
+                      edge="end"
+                      sx={{ color: 'white' }}
+                    >
+                      {passwordHide ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
             }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            name="confirm_password"
+            name="confirm_user_password"
             label="Confirm Password"
-            type="password"
-            id="confirm_password"
+            type={confrim_passwordHide ? "text": "password"}
+            id="confirm_user_password"
             autoComplete="current-password"
-            value={formData.confirm_password}
+            value={formData.confirm_user_password}
             onChange={handleChange}
             InputLabelProps={{ style: { color: "#FFFFFF" } }}
             InputProps={{
               style: { color: "#FFFFFF", backgroundColor: "#292942", borderRadius: "5px" },
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={toggle_confrim_Password}
+                    edge="end"
+                    sx={{ color: 'white' }}
+                  >
+                    {confrim_passwordHide ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
             }}
           />
           <Button
@@ -132,7 +182,7 @@ const Register = () => {
           />
           <div style={{ marginTop: "1rem", textAlign: "center", color: "#FFFFFF" }}>
             Already have an account?
-           <Link to='/'>Login</Link>
+            <Link style={{marginLeft: 4, color: "#C4C4C4", textDecoration: "none" }} to='/'>Login</Link>
           </div>
         </Box>
       </Box>
