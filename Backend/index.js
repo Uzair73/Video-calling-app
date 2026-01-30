@@ -4,7 +4,11 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+const cors = require("cors"); // Added for CORS
 const pool = require("./daos/db_connection/db_connect");
+
+// Enable CORS for all routes
+app.use(cors());
 
 // define route path
 const auth_routes = require('./routes/auth_routes')
