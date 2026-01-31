@@ -2,3 +2,6 @@ node_modules/
 
 # environment variables
 .env
+
+#socketScript.js
+socketScript.js
