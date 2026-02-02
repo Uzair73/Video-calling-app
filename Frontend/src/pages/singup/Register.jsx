@@ -2,10 +2,11 @@ import { Box, Container, Typography, TextField, Alert, IconButton, InputAdornmen
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import React, { useState } from "react";
 import Button from "../../components/button/button";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../../api/api';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -37,7 +38,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(formData.username === "" || formData.email === "" || formData.user_password === "" || formData.confirm_user_password === ""){
+    if (formData.username === "" || formData.email === "" || formData.user_password === "" || formData.confirm_user_password === "") {
       return setError("Please fill in all fields");
     }
     if (formData.user_password !== formData.confirm_user_password) {
@@ -45,10 +46,15 @@ const Register = () => {
       return;
     }
     try {
-      const res = await register(formData);
+      const res = await register(formData.username, formData.email, formData.user_password);
       console.log("Registration successful", res.data);
-      setSuccess(res.data.message);
+      setSuccess(res.data.message || "Registration successful! Redirecting to login...");
       setError("");
+
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
       console.error("Registration error", error);
       setError(error.response?.data?.message || "An unexpected error occurred.");
@@ -112,7 +118,7 @@ const Register = () => {
             fullWidth
             name="user_password"
             label="Password"
-            type={passwordHide ? "text": "password"}
+            type={passwordHide ? "text" : "password"}
             id="user_password"
             autoComplete="current-password"
             value={formData.user_password}
@@ -120,18 +126,18 @@ const Register = () => {
             InputLabelProps={{ style: { color: "#FFFFFF" } }}
             InputProps={{
               style: { color: "#FFFFFF", backgroundColor: "#292942", borderRadius: "5px" },
-               endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={togglePassword}
-                      edge="end"
-                      sx={{ color: 'white' }}
-                    >
-                      {passwordHide ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                )
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={togglePassword}
+                    edge="end"
+                    sx={{ color: 'white' }}
+                  >
+                    {passwordHide ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
             }}
           />
           <TextField
@@ -140,7 +146,7 @@ const Register = () => {
             fullWidth
             name="confirm_user_password"
             label="Confirm Password"
-            type={confrim_passwordHide ? "text": "password"}
+            type={confrim_passwordHide ? "text" : "password"}
             id="confirm_user_password"
             autoComplete="current-password"
             value={formData.confirm_user_password}
@@ -182,7 +188,7 @@ const Register = () => {
           />
           <div style={{ marginTop: "1rem", textAlign: "center", color: "#FFFFFF" }}>
             Already have an account?
-            <Link style={{marginLeft: 4, color: "#C4C4C4", textDecoration: "none" }} to='/'>Login</Link>
+            <Link style={{ marginLeft: 4, color: "#C4C4C4", textDecoration: "none" }} to='/'>Login</Link>
           </div>
         </Box>
       </Box>

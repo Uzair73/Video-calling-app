@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Box, Container, Typography, TextField, IconButton, InputAdornment, Alert } from "@mui/material";
 import Button from "../../components/button/button"; // Assuming you have a custom Button component
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../api/api';
+import { useAuth } from '../../context/AuthContext';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { loginUser } = useAuth();
   const [input, setInput] = useState({
     email: "",
     user_password: "",
@@ -28,18 +31,29 @@ const Login = () => {
 
   const handle_submit = async (e) => {
     e.preventDefault();
-    if(input.email === "" || input.user_password === "") {
+    if (input.email === "" || input.user_password === "") {
       return setError("Please fill in all fields");
     }
     try {
-      const formdata = input
-      const res = await login(formdata);
-      console.log("Login successful", res.message);
-      setSuccess(res.message);
+      const res = await login(input.email, input.user_password);
+      console.log("Login successful", res);
+
+      // Update AuthContext state
+      loginUser(res.token, res.user);
+
+      setSuccess(res.message || "Login successful!");
       setError("");
+
+      // Redirect to dashboard immediately
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
     } catch (error) {
+      console.error("Login error:", error);
       if (error.response && error.response.data.message) {
         setError(error.response.data.message);
+      } else {
+        setError("Login failed. Please try again.");
       }
       setSuccess("");
     }
